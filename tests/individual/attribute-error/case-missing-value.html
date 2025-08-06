@@ -1,0 +1,11 @@
+<!-- TEST_META:
+  name: "wr-case missing value"
+  expected_result: "error"
+  expected_error_message: "Missing required attributes for 'wr-case': value"
+  description: "wr-case without value attribute should trigger error"
+-->
+<div>
+  <wr-switch value="test">
+    <wr-case>Content without value</wr-case>
+  </wr-switch>
+</div>

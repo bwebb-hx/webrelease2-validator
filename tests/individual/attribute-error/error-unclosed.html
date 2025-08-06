@@ -1,0 +1,11 @@
+<!-- TEST_META:
+  name: "wr-error unclosed"
+  expected_result: "error"
+  expected_error_message: "Unclosed element: wr-error"
+  description: "Unclosed wr-error should trigger structure error"
+-->
+<div>
+  <wr-error condition="isNull(email)">
+    Error message
+  <!-- Missing </wr-error> -->
+</div>

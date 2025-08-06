@@ -1,0 +1,9 @@
+<!-- TEST_META:
+  name: "wr-cond outside wr-conditional"
+  expected_result: "error"
+  expected_error_message: "wr-cond can only be used inside wr-conditional"
+  description: "wr-cond outside wr-conditional should trigger structure error"
+-->
+<div>
+  <wr-cond condition="true">This should be inside wr-conditional</wr-cond>
+</div>

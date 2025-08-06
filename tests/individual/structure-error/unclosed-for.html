@@ -1,0 +1,11 @@
+<!-- TEST_META:
+  name: "Unclosed wr-for"
+  expected_result: "error"
+  expected_error_message: "Unclosed element: wr-for"
+  description: "Unclosed wr-for should trigger structure error"
+-->
+<div>
+  <wr-for list="items" variable="item">
+    <p>%item%</p>
+  <!-- Missing </wr-for> -->
+</div>

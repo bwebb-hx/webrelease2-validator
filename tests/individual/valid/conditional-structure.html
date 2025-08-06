@@ -1,0 +1,15 @@
+<!-- TEST_META:
+  name: "wr-conditional structure"
+  expected_result: "valid"
+  description: "Valid wr-conditional with wr-cond elements"
+-->
+<div>
+  <wr-conditional>
+    <wr-cond condition="isNotNull(startDate)">
+      Event starts: %formatDate(startDate, "yyyy/MM/dd")%
+    </wr-cond>
+    <wr-cond condition="isNotNull(endDate)">
+      Event ends: %formatDate(endDate, "yyyy/MM/dd")%
+    </wr-cond>
+  </wr-conditional>
+</div>

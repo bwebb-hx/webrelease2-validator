@@ -1,0 +1,9 @@
+<!-- TEST_META:
+  name: "wr-error self-closing when should contain content"
+  expected_result: "error"
+  expected_error_message: "Element wr-error should not be self-closing"
+  description: "wr-error should contain content, not be self-closing"
+-->
+<div>
+  <wr-error condition="isNull(email)" />
+</div>

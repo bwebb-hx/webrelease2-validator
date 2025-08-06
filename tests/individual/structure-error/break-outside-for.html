@@ -1,0 +1,9 @@
+<!-- TEST_META:
+  name: "wr-break outside wr-for"
+  expected_result: "error"
+  expected_error_message: "wr-break can only be used inside wr-for loops"
+  description: "wr-break used outside wr-for should trigger structure error"
+-->
+<div>
+  <wr-break condition="true"/>
+</div>

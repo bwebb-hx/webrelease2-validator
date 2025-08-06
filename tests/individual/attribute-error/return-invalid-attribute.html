@@ -1,0 +1,9 @@
+<!-- TEST_META:
+  name: "wr-return with invalid attribute"
+  expected_result: "error"
+  expected_error_message: "Invalid attribute 'condition' for element 'wr-return'"
+  description: "wr-return with invalid attributes should trigger error"
+-->
+<div>
+  <wr-return value="result" condition="something"/>
+</div>

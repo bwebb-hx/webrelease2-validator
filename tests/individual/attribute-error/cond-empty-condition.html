@@ -1,0 +1,11 @@
+<!-- TEST_META:
+  name: "wr-cond empty condition attribute"
+  expected_result: "error"
+  expected_error_message: "Empty condition attribute is not allowed"
+  description: "wr-cond with empty condition should trigger error"
+-->
+<div>
+  <wr-conditional>
+    <wr-cond condition="">Empty condition</wr-cond>
+  </wr-conditional>
+</div>

@@ -1,0 +1,9 @@
+<!-- TEST_META:
+  name: "Invalid variable name (starts with number)"
+  expected_result: "error"
+  expected_error_message: "Invalid variable name '1invalid'"
+  description: "Variable names starting with numbers should trigger error"
+-->
+<div>
+  <wr-variable name="1invalid" value="test"/>
+</div>

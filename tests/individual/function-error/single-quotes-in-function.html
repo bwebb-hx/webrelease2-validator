@@ -1,0 +1,9 @@
+<!-- TEST_META:
+  name: "Single quotes in function call"
+  expected_result: "error"
+  expected_error_message: "Use double quotes for string literals in function calls"
+  description: "Single quotes in function calls should trigger error"
+-->
+<div>
+  <wr-if condition="test('param')">Content</wr-if>
+</div>

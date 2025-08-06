@@ -1,0 +1,11 @@
+<!-- TEST_META:
+  name: "wr-for conflicting sources"
+  expected_result: "error"
+  expected_error_message: "wr-for cannot combine: list, string"
+  description: "wr-for with multiple loop sources should trigger error"
+-->
+<div>
+  <wr-for list="items" string="text" variable="item">
+    <p>Content</p>
+  </wr-for>
+</div>

@@ -1,0 +1,9 @@
+<!-- TEST_META:
+  name: "wr-append empty name attribute"
+  expected_result: "error"
+  expected_error_message: "Empty name attribute is not allowed"
+  description: "wr-append with empty name should trigger error"
+-->
+<div>
+  <wr-append name="" value="branch"/>
+</div>

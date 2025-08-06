@@ -1,0 +1,11 @@
+<!-- TEST_META:
+  name: "wr-if missing condition"
+  expected_result: "error"
+  expected_error_message: "Missing required attributes for 'wr-if': condition"
+  description: "wr-if without condition attribute should trigger error"
+-->
+<div>
+  <wr-if>
+    <wr-then>Content</wr-then>
+  </wr-if>
+</div>

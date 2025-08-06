@@ -1,0 +1,9 @@
+<!-- TEST_META:
+  name: "wr-case outside wr-switch"
+  expected_result: "error"
+  expected_error_message: "wr-case can only be used inside wr-switch"
+  description: "wr-case used outside wr-switch should trigger structure error"
+-->
+<div>
+  <wr-case value="test">This should be inside wr-switch</wr-case>
+</div>

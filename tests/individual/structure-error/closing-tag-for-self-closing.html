@@ -1,0 +1,12 @@
+<!-- TEST_META:
+  name: "Closing tag for self-closing element"
+  expected_result: "error"
+  expected_error_message: "Self-closing element wr-break should not have closing tag"
+  description: "Closing tags for self-closing elements should trigger error"
+-->
+<div>
+  <wr-for list="items" variable="item">
+    <wr-break/>
+    </wr-break>
+  </wr-for>
+</div>

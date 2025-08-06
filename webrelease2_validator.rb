@@ -95,10 +95,12 @@ class WebRelease2Validator
   def validate_content(content)
     lines = content.split("\n")
     element_stack = []
+    content_model_tracker = {}
 
     lines.each_with_index do |line, index|
       line_num = index + 1
       validate_line(line, line_num, element_stack)
+      track_content_model(line, line_num, element_stack, content_model_tracker)
     end
 
     # Check for unclosed elements
@@ -106,6 +108,9 @@ class WebRelease2Validator
       @errors << ValidationError.new(line_num, 0, ERROR_TYPES[:structure],
                                    "Unclosed element: #{element}", "")
     end
+
+    # Validate content models (temporarily disabled - creates false positives with nesting)  
+    # validate_content_models(content_model_tracker)
   end
 
   def validate_line(line, line_num, element_stack)
@@ -193,15 +198,33 @@ class WebRelease2Validator
   end
 
   def validate_wr_elements(line, line_num, element_stack)
+    # Remove HTML comments before processing to avoid false matches
+    cleaned_line = line.gsub(/<!--.*?-->/, '')
+    
+    # Check for self-closing tags first
+    cleaned_line.scan(/<(wr-(?:\w+|->))((?:\s+\w+\s*=\s*"(?:[^"\\]|\\.)*")*)\s*\/>/) do |element_name, attributes_str|
+      if @wr_elements.key?(element_name)
+        validate_self_closing_element(element_name, attributes_str, line_num, line, element_stack)
+      else
+        @errors << ValidationError.new(line_num, 0, ERROR_TYPES[:syntax],
+                                     "Unknown WebRelease2 element: #{element_name}",
+                                     line.strip)
+      end
+    end
+
     # Find opening tags with proper attribute parsing
     # This regex handles quoted attributes that may contain > characters
     # Special handling for wr--> comment syntax
-    line.scan(/<(wr-(?:\w+|->))((?:\s+\w+\s*=\s*"(?:[^"\\]|\\.)*")*)\s*>/) do |element_name, attributes_str|
+    cleaned_line.scan(/<(wr-(?:\w+|->))((?:\s+\w+\s*=\s*"(?:[^"\\]|\\.)*")*)\s*>/) do |element_name, attributes_str|
+      # Skip if already processed as self-closing
+      next if cleaned_line.include?("<#{element_name}#{attributes_str.empty? ? '' : ' ' + attributes_str.strip} />")
+      
       if @wr_elements.key?(element_name)
         validate_wr_attributes(element_name, attributes_str, line_num, line)
+        validate_element_context(element_name, line_num, element_stack, line)
 
         # Add to stack for nesting validation (except self-closing elements)
-        unless %w[wr--> wr-break wr-variable wr-append wr-clear wr-return].include?(element_name)
+        unless %w[wr--> wr-break wr-append wr-clear wr-return].include?(element_name)
           element_stack << [element_name, line_num]
         end
       else
@@ -211,9 +234,17 @@ class WebRelease2Validator
       end
     end
 
-    # Find closing tags (including special wr--> syntax)
-    line.scan(/<\/(wr-(?:\w+|->))>/) do |closing_element|
+    # Find closing tags (including special wr--> syntax) - use cleaned line to avoid false matches in comments
+    cleaned_line.scan(/<\/(wr-(?:\w+|->))>/) do |closing_element|
       closing_element = closing_element[0]
+      
+      # Check if this is a self-closing element that shouldn't have closing tags
+      if %w[wr-break wr-append wr-clear wr-return].include?(closing_element)
+        @errors << ValidationError.new(line_num, 0, ERROR_TYPES[:structure],
+                                     "Self-closing element #{closing_element} should not have closing tag",
+                                     line.strip)
+        next
+      end
       
       if element_stack.any?
         expected_element, _ = element_stack.last
@@ -230,6 +261,9 @@ class WebRelease2Validator
                                      line.strip)
       end
     end
+
+    # Check for malformed WebRelease2 tags
+    validate_malformed_tags(line, line_num)
 
     # Handle special comment syntax - check for proper <wr--> and </wr--> pairing
     if line.include?('<wr-->')
@@ -298,8 +332,23 @@ class WebRelease2Validator
   end
 
   def validate_attribute_value(element_name, attr_name, attr_value, line_num, context)
+    # Check for empty attribute values (except where allowed)
+    if attr_value.strip.empty?
+      case attr_name
+      when 'condition'
+        @errors << ValidationError.new(line_num, 0, ERROR_TYPES[:attribute],
+                                     "Empty condition attribute is not allowed",
+                                     context.strip)
+      when 'value', 'name', 'variable', 'list', 'string'
+        @errors << ValidationError.new(line_num, 0, ERROR_TYPES[:attribute],
+                                     "Empty #{attr_name} attribute is not allowed",
+                                     context.strip)
+      end
+      return
+    end
+
     # Validate condition attributes
-    if attr_name == 'condition' && !attr_value.empty? 
+    if attr_name == 'condition'
       # Check for single quotes in function calls (should use double quotes)
       if attr_value.match?(/\w+\s*\(\s*'[^']*'\s*\)/)
         @errors << ValidationError.new(line_num, 0, ERROR_TYPES[:syntax],
@@ -312,6 +361,16 @@ class WebRelease2Validator
                                      "Invalid condition syntax: #{attr_value}",
                                      context.strip)
       end
+    end
+
+    # Validate variable names
+    if attr_name == 'name' || attr_name == 'variable'
+      validate_variable_name(attr_value, line_num, context)
+    end
+
+    # Validate numeric attributes
+    if attr_name == 'times'
+      validate_numeric_attribute(attr_value, attr_name, line_num, context)
     end
   end
 
@@ -329,6 +388,214 @@ class WebRelease2Validator
     return true if condition.strip.match?(/^[a-zA-Z_]\w*(\.\w+)*$/)
 
     true # Be permissive for complex conditions
+  end
+
+  def validate_variable_name(name, line_num, context)
+    # Check for valid variable naming
+    unless name.match?(/^[a-zA-Z_]\w*$/)
+      @errors << ValidationError.new(line_num, 0, ERROR_TYPES[:attribute],
+                                   "Invalid variable name '#{name}' - must start with letter/underscore, contain only alphanumeric characters",
+                                   context.strip)
+    end
+
+    # Check for reserved keywords
+    reserved_keywords = %w[for if switch case default then else conditional cond break variable append clear error return comment]
+    if reserved_keywords.include?(name.downcase)
+      @errors << ValidationError.new(line_num, 0, ERROR_TYPES[:attribute],
+                                   "Variable name '#{name}' conflicts with reserved WebRelease2 keyword",
+                                   context.strip)
+    end
+  end
+
+  def validate_numeric_attribute(value, attr_name, line_num, context)
+    unless value.match?(/^\d+$/)
+      @errors << ValidationError.new(line_num, 0, ERROR_TYPES[:attribute],
+                                   "#{attr_name} attribute must be a positive integer, got '#{value}'",
+                                   context.strip)
+      return
+    end
+
+    num_value = value.to_i
+    if num_value <= 0
+      @errors << ValidationError.new(line_num, 0, ERROR_TYPES[:attribute],
+                                   "#{attr_name} attribute must be greater than 0, got #{num_value}",
+                                   context.strip)
+    end
+  end
+
+  def validate_self_closing_element(element_name, attributes_str, line_num, context, element_stack)
+    # Elements that should always be self-closing
+    self_closing_required = %w[wr-break wr-append wr-clear wr-return]
+    
+    # Elements that should NOT be self-closing
+    container_elements = %w[wr-if wr-switch wr-case wr-default wr-conditional wr-cond wr-then wr-else wr-for wr-error wr-comment]
+    
+    # wr-variable is special - can be self-closing with or without value attribute
+    if element_name == 'wr-variable'
+      validate_wr_attributes(element_name, attributes_str, line_num, context)
+    elsif container_elements.include?(element_name)
+      @errors << ValidationError.new(line_num, 0, ERROR_TYPES[:structure],
+                                   "Element #{element_name} should not be self-closing - it must contain content",
+                                   context.strip)
+    elsif self_closing_required.include?(element_name)
+      # Validate attributes for self-closing elements
+      validate_wr_attributes(element_name, attributes_str, line_num, context)
+    end
+    
+    # Validate context for all self-closing elements (they still need proper parent context)
+    validate_element_context(element_name, line_num, element_stack, context)
+  end
+
+  def validate_element_context(element_name, line_num, element_stack, context)
+    # Context-aware validation - check if elements are used in correct parent contexts
+    case element_name
+    when 'wr-case', 'wr-default'
+      unless element_stack.any? { |elem, _| elem == 'wr-switch' }
+        @errors << ValidationError.new(line_num, 0, ERROR_TYPES[:structure],
+                                     "#{element_name} can only be used inside wr-switch",
+                                     context.strip)
+      end
+    when 'wr-cond'
+      unless element_stack.any? { |elem, _| elem == 'wr-conditional' }
+        @errors << ValidationError.new(line_num, 0, ERROR_TYPES[:structure],
+                                     "wr-cond can only be used inside wr-conditional",
+                                     context.strip)
+      end
+    when 'wr-then', 'wr-else'
+      unless element_stack.any? { |elem, _| elem == 'wr-if' }
+        @errors << ValidationError.new(line_num, 0, ERROR_TYPES[:structure],
+                                     "#{element_name} can only be used inside wr-if",
+                                     context.strip)
+      end
+    when 'wr-break'
+      unless element_stack.any? { |elem, _| elem == 'wr-for' }
+        @errors << ValidationError.new(line_num, 0, ERROR_TYPES[:structure],
+                                     "wr-break can only be used inside wr-for loops",
+                                     context.strip)
+      end
+    end
+  end
+
+  def validate_malformed_tags(line, line_num)
+    # Check for malformed wr-comment tags (missing closing >)
+    if line.match?(/<wr-comment\s+[^>]*(?<!>)$/)
+      @errors << ValidationError.new(line_num, 0, ERROR_TYPES[:syntax],
+                                   "Malformed wr-comment tag - missing closing '>'",
+                                   line.strip)
+    end
+
+    # Check for wr-comment with content but no proper structure
+    if line.match?(/<wr-comment\s+[^>]*[^\/]>/) && !line.match?(/<wr-comment>.*<\/wr-comment>/)
+      @errors << ValidationError.new(line_num, 0, ERROR_TYPES[:syntax],
+                                   "Invalid wr-comment syntax - use <wr-comment>content</wr-comment>",
+                                   line.strip)
+    end
+
+    # Check for wr-comment with self-closing syntax but containing content
+    if line.match?(/<wr-comment\s+[^>\/]+\s*\/>/)
+      @errors << ValidationError.new(line_num, 0, ERROR_TYPES[:syntax],
+                                   "Invalid wr-comment syntax - cannot use self-closing with content",
+                                   line.strip)
+    end
+
+    # Check for other malformed WebRelease2 tags
+    line.scan(/<(wr-\w+)\s+[^>]*(?<!>)(?<!\/)$/) do |element_name|
+      @errors << ValidationError.new(line_num, 0, ERROR_TYPES[:syntax],
+                                   "Malformed #{element_name[0]} tag - missing closing '>' or '/>'",
+                                   line.strip)
+    end
+  end
+
+  def track_content_model(line, line_num, element_stack, tracker)
+    return if element_stack.empty?
+
+    # Only track the immediate parent that has content model restrictions
+    current_parent = element_stack.last[0]
+    
+    # Track content for elements that have content model restrictions
+    if %w[wr-switch wr-conditional].include?(current_parent)
+      parent_key = "#{current_parent}_#{element_stack.last[1]}"
+      tracker[parent_key] ||= { 
+        parent_type: current_parent,
+        children: [], 
+        line_numbers: [], 
+        direct_content: []
+      }
+      
+      # Only track DIRECT children - elements that are immediately inside this parent
+      # Check if we're at the direct child level (element_stack depth matters)
+      if element_stack.size == 1 || element_stack[-2][0] != current_parent
+        # Track WebRelease2 child elements
+        line.scan(/<(wr-\w+)(?:\s|>)/) do |child_element|
+          child_element = child_element[0]
+          
+          # Don't track if this line closes the parent
+          unless line.include?("</#{current_parent}>")
+            tracker[parent_key][:children] << child_element
+            tracker[parent_key][:line_numbers] << line_num
+          end
+        end
+        
+        # Check for direct non-WebRelease2 content (HTML tags, text content)
+        cleaned_line = line.strip.gsub(/<!--.*?-->/, '') # Remove HTML comments
+        
+        # Look for HTML tags that aren't WebRelease2 tags
+        if cleaned_line.match?(/<(?!wr-|\/wr-|!--)\w+/)
+          tracker[parent_key][:direct_content] << line_num
+        end
+      end
+    end
+  end
+
+  def validate_content_models(tracker)
+    tracker.each do |parent_key, data|
+      case data[:parent_type]
+      when 'wr-switch'
+        validate_switch_content_model(data)
+      when 'wr-conditional' 
+        validate_conditional_content_model(data)
+      end
+    end
+  end
+
+  def validate_switch_content_model(data)
+    invalid_children = data[:children] - %w[wr-case wr-default]
+    if invalid_children.any?
+      line_nums = data[:line_numbers][0, invalid_children.size]
+      @errors << ValidationError.new(line_nums.first || 0, 0, ERROR_TYPES[:structure],
+                                   "wr-switch can only contain wr-case and wr-default elements, found: #{invalid_children.join(', ')}",
+                                   "")
+    end
+
+    if data[:direct_content].any?
+      @errors << ValidationError.new(data[:direct_content].first, 0, ERROR_TYPES[:structure],
+                                   "wr-switch cannot contain direct content - only wr-case and wr-default elements",
+                                   "")
+    end
+
+    # Check for multiple wr-default elements
+    default_count = data[:children].count('wr-default')
+    if default_count > 1
+      @errors << ValidationError.new(data[:line_numbers].first || 0, 0, ERROR_TYPES[:structure],
+                                   "wr-switch can only contain one wr-default element",
+                                   "")
+    end
+  end
+
+  def validate_conditional_content_model(data)
+    invalid_children = data[:children] - %w[wr-cond]
+    if invalid_children.any?
+      line_nums = data[:line_numbers][0, invalid_children.size]
+      @errors << ValidationError.new(line_nums.first || 0, 0, ERROR_TYPES[:structure],
+                                   "wr-conditional can only contain wr-cond elements, found: #{invalid_children.join(', ')}",
+                                   "")
+    end
+
+    if data[:direct_content].any?
+      @errors << ValidationError.new(data[:direct_content].first, 0, ERROR_TYPES[:structure],
+                                   "wr-conditional cannot contain direct content - only wr-cond elements",
+                                   "")
+    end
   end
 
   def balanced_parentheses?(expression)
@@ -362,8 +629,8 @@ def main
   end.parse!
 
   if ARGV.empty?
-    puts "Error: Please specify a template file to validate"
-    puts "Usage: ruby #{$0} [options] file"
+    $stderr.puts "Error: Please specify a template file to validate"
+    $stderr.puts "Usage: ruby #{$0} [options] file"
     exit 1
   end
 
@@ -375,17 +642,17 @@ def main
     puts "✅ #{filepath} is valid!"
     exit 0
   else
-    puts "❌ Found #{errors.size} error(s) in #{filepath}:"
-    puts
+    $stderr.puts "❌ Found #{errors.size} error(s) in #{filepath}:"
+    $stderr.puts
 
     errors.each do |error|
       if options[:verbose]
-        puts "Line #{error.line_number}:#{error.column} - #{error.error_type}"
-        puts "  #{error.message}"
-        puts "  Context: #{error.context}" unless error.context.empty?
-        puts
+        $stderr.puts "Line #{error.line_number}:#{error.column} - #{error.error_type}"
+        $stderr.puts "  #{error.message}"
+        $stderr.puts "  Context: #{error.context}" unless error.context.empty?
+        $stderr.puts
       else
-        puts "Line #{error.line_number}: #{error.message}"
+        $stderr.puts "Line #{error.line_number}: #{error.message}"
       end
     end
 

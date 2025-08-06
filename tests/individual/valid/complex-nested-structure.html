@@ -1,0 +1,31 @@
+<!-- TEST_META:
+  name: "Complex nested structure"
+  expected_result: "valid"
+  description: "Complex nested WebRelease2 structures"
+-->
+<div>
+  <wr-for list="categories" variable="category">
+    <h2>%category.name%</h2>
+    <wr-if condition="category.hasItems">
+      <wr-then>
+        <wr-for list="category.items" variable="item" count="itemIndex">
+          <wr-switch value="item.type">
+            <wr-case value="product">
+              <div class="product">%item.name%</div>
+            </wr-case>
+            <wr-case value="service">
+              <div class="service">%item.name%</div>
+            </wr-case>
+            <wr-default>
+              <div class="other">%item.name%</div>
+            </wr-default>
+          </wr-switch>
+          <wr-break condition="itemIndex >= 10"/>
+        </wr-for>
+      </wr-then>
+      <wr-else>
+        <p>No items in this category</p>
+      </wr-else>
+    </wr-if>
+  </wr-for>
+</div>

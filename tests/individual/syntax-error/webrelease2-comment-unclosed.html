@@ -1,0 +1,9 @@
+<!-- TEST_META:
+  name: "WebRelease2 comment unclosed"
+  expected_result: "error"
+  expected_error_message: "WebRelease2 comment must be closed with </wr--> on the same line"
+  description: "Unclosed wr--> comment should trigger error"
+-->
+<div>
+  <wr-->This comment is not closed properly
+</div>

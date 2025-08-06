@@ -1,0 +1,9 @@
+<!-- TEST_META:
+  name: "Self-closing container element"
+  expected_result: "error"
+  expected_error_message: "Element wr-if should not be self-closing"
+  description: "Self-closing container elements should trigger error"
+-->
+<div>
+  <wr-if condition="true" />
+</div>

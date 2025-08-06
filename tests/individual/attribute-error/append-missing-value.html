@@ -1,0 +1,9 @@
+<!-- TEST_META:
+  name: "wr-append missing value attribute"
+  expected_result: "error"
+  expected_error_message: "Missing required attributes for 'wr-append': value"
+  description: "wr-append without value attribute should trigger error"
+-->
+<div>
+  <wr-append name="branches"/>
+</div>

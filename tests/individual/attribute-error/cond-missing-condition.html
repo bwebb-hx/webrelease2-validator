@@ -1,0 +1,11 @@
+<!-- TEST_META:
+  name: "wr-cond missing condition attribute"
+  expected_result: "error"
+  expected_error_message: "Missing required attributes for 'wr-cond': condition"
+  description: "wr-cond without condition attribute should trigger error"
+-->
+<div>
+  <wr-conditional>
+    <wr-cond>Missing condition</wr-cond>
+  </wr-conditional>
+</div>

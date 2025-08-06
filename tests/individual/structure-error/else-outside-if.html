@@ -1,0 +1,9 @@
+<!-- TEST_META:
+  name: "wr-else outside wr-if"
+  expected_result: "error"
+  expected_error_message: "wr-else can only be used inside wr-if"
+  description: "wr-else outside wr-if should trigger structure error"
+-->
+<div>
+  <wr-else>This should be inside wr-if</wr-else>
+</div>

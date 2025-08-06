@@ -1,0 +1,11 @@
+<!-- TEST_META:
+  name: "Invalid times attribute (non-numeric)"
+  expected_result: "error"
+  expected_error_message: "times attribute must be a positive integer, got 'abc'"
+  description: "Non-numeric times attribute should trigger error"
+-->
+<div>
+  <wr-for times="abc" variable="i">
+    <p>Content</p>
+  </wr-for>
+</div>

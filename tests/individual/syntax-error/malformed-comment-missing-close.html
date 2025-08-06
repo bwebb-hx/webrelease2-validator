@@ -1,0 +1,9 @@
+<!-- TEST_META:
+  name: "Malformed wr-comment (missing close)"
+  expected_result: "error"
+  expected_error_message: "Malformed wr-comment tag"
+  description: "wr-comment without closing > should trigger syntax error"
+-->
+<div>
+  <wr-comment This is malformed
+</div>

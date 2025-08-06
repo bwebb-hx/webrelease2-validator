@@ -1,0 +1,9 @@
+<!-- TEST_META:
+  name: "wr-variable with special characters in name"
+  expected_result: "error"
+  expected_error_message: "Invalid variable name 'test-var'"
+  description: "Variable names with special characters should trigger error"
+-->
+<div>
+  <wr-variable name="test-var" value="test"/>
+</div>

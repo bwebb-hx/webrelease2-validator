@@ -1,0 +1,9 @@
+<!-- TEST_META:
+  name: "wr-default outside wr-switch"
+  expected_result: "error"
+  expected_error_message: "wr-default can only be used inside wr-switch"
+  description: "wr-default outside wr-switch should trigger structure error"
+-->
+<div>
+  <wr-default>This should be inside wr-switch</wr-default>
+</div>

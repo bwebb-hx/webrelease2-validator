@@ -1,0 +1,11 @@
+<!-- TEST_META:
+  name: "wr-variable with content inside"
+  expected_result: "error"
+  expected_error_message: "Unclosed element: wr-variable"
+  description: "wr-variable used as container should trigger error"
+-->
+<div>
+  <wr-variable name="test" value="initial">
+    Content not allowed
+  <!-- Missing </wr-variable> but this should be self-closing anyway -->
+</div>

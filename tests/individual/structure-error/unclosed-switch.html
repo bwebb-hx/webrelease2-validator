@@ -1,0 +1,11 @@
+<!-- TEST_META:
+  name: "Unclosed wr-switch"
+  expected_result: "error"
+  expected_error_message: "Unclosed element: wr-switch"
+  description: "Unclosed wr-switch should trigger structure error"
+-->
+<div>
+  <wr-switch value="test">
+    <wr-case value="a">Content</wr-case>
+  <!-- Missing </wr-switch> -->
+</div>

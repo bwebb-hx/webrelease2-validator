@@ -1,0 +1,9 @@
+<!-- TEST_META:
+  name: "Reserved keyword variable name"
+  expected_result: "error"
+  expected_error_message: "Variable name 'if' conflicts with reserved WebRelease2 keyword"
+  description: "Variable names using reserved keywords should trigger error"
+-->
+<div>
+  <wr-variable name="if" value="test"/>
+</div>

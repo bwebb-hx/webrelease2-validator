@@ -1,0 +1,9 @@
+<!-- TEST_META:
+  name: "Unbalanced parentheses"
+  expected_result: "error"
+  expected_error_message: "Unbalanced parentheses in function call"
+  description: "Unbalanced parentheses should trigger function error"
+-->
+<div>
+  Value: %test(unclosed%
+</div>

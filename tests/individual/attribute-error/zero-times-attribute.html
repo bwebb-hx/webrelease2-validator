@@ -1,0 +1,11 @@
+<!-- TEST_META:
+  name: "Zero times attribute"
+  expected_result: "error"
+  expected_error_message: "times attribute must be greater than 0, got 0"
+  description: "Zero times attribute should trigger error"
+-->
+<div>
+  <wr-for times="0" variable="i">
+    <p>Content</p>
+  </wr-for>
+</div>

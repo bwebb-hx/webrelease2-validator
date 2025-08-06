@@ -1,0 +1,11 @@
+<!-- TEST_META:
+  name: "Empty condition attribute"
+  expected_result: "error"
+  expected_error_message: "Empty condition attribute is not allowed"
+  description: "wr-if with empty condition should trigger error"
+-->
+<div>
+  <wr-if condition="">
+    <wr-then>Content</wr-then>
+  </wr-if>
+</div>

@@ -1,0 +1,11 @@
+<!-- TEST_META:
+  name: "wr-error with invalid attribute"
+  expected_result: "error"
+  expected_error_message: "Invalid attribute 'value' for element 'wr-error'"
+  description: "wr-error with invalid attributes should trigger error"
+-->
+<div>
+  <wr-error condition="isNull(email)" value="something">
+    Error message
+  </wr-error>
+</div>

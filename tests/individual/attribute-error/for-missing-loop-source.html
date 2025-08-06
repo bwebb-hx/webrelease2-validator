@@ -1,0 +1,11 @@
+<!-- TEST_META:
+  name: "wr-for missing loop source"
+  expected_result: "error"
+  expected_error_message: "wr-for must have one of: list, string, or times"
+  description: "wr-for without list/string/times should trigger error"
+-->
+<div>
+  <wr-for variable="item">
+    <p>Content</p>
+  </wr-for>
+</div>

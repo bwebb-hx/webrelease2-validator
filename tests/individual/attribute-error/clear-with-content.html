@@ -1,0 +1,11 @@
+<!-- TEST_META:
+  name: "wr-clear with content inside"
+  expected_result: "error"
+  expected_error_message: "Self-closing element wr-clear should not have closing tag"
+  description: "wr-clear should be self-closing, not contain content"
+-->
+<div>
+  <wr-clear name="branches">
+    Content not allowed
+  </wr-clear>
+</div>

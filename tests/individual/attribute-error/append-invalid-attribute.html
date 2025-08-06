@@ -1,0 +1,9 @@
+<!-- TEST_META:
+  name: "wr-append with invalid attribute"
+  expected_result: "error"
+  expected_error_message: "Invalid attribute 'condition' for element 'wr-append'"
+  description: "wr-append with invalid attributes should trigger error"
+-->
+<div>
+  <wr-append name="branches" value="branch" condition="something"/>
+</div>

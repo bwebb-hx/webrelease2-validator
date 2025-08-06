@@ -1,0 +1,9 @@
+<!-- TEST_META:
+  name: "wr-comment with attributes inside tag"
+  expected_result: "error"
+  expected_error_message: "Invalid wr-comment syntax"
+  description: "wr-comment with content in tag should trigger error"
+-->
+<div>
+  <wr-comment This content should not be here -->
+</div>

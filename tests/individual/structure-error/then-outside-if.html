@@ -1,0 +1,9 @@
+<!-- TEST_META:
+  name: "wr-then outside wr-if"
+  expected_result: "error"
+  expected_error_message: "wr-then can only be used inside wr-if"
+  description: "wr-then outside wr-if should trigger structure error"
+-->
+<div>
+  <wr-then>This should be inside wr-if</wr-then>
+</div>

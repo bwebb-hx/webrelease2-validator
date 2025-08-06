@@ -1,0 +1,11 @@
+<!-- TEST_META:
+  name: "Unclosed wr-if"
+  expected_result: "error"
+  expected_error_message: "Unclosed element: wr-if"
+  description: "Unclosed wr-if should trigger structure error"
+-->
+<div>
+  <wr-if condition="true">
+    <wr-then>Content</wr-then>
+  <!-- Missing </wr-if> -->
+</div>

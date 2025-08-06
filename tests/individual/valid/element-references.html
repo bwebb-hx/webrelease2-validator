@@ -1,0 +1,11 @@
+<!-- TEST_META:
+  name: "Element references"
+  expected_result: "valid"
+  description: "Valid element references with dot notation and array access"
+-->
+<div>
+  <p>Item name: %item.name%</p>
+  <p>First item: %items[0].title%</p>
+  <p>Dynamic index: %items[currentIndex]%</p>
+  <p>Nested property: %user.profile.settings.theme%</p>
+</div>

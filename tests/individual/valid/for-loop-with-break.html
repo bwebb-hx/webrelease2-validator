@@ -1,0 +1,11 @@
+<!-- TEST_META:
+  name: "wr-for loop with break"
+  expected_result: "valid"
+  description: "Valid wr-for loop with conditional break"
+-->
+<div>
+  <wr-for list="items" variable="item" count="i">
+    <p>Item: %item% (index: %i%)</p>
+    <wr-break condition="i == 5"/>
+  </wr-for>
+</div>

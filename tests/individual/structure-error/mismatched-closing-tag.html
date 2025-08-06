@@ -1,0 +1,11 @@
+<!-- TEST_META:
+  name: "Mismatched closing tag"
+  expected_result: "error"
+  expected_error_message: "Mismatched closing tag: expected wr-if, found wr-switch"
+  description: "Mismatched closing tags should trigger structure error"
+-->
+<div>
+  <wr-if condition="true">
+    <wr-then>Content</wr-then>
+  </wr-switch>
+</div>

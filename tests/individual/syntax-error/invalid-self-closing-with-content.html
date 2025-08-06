@@ -1,0 +1,9 @@
+<!-- TEST_META:
+  name: "Invalid self-closing with content"
+  expected_result: "error"
+  expected_error_message: "cannot use self-closing with content"
+  description: "Self-closing syntax with content should trigger error"
+-->
+<div>
+  <wr-comment This has content />
+</div>

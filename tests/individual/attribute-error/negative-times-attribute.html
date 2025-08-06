@@ -1,0 +1,11 @@
+<!-- TEST_META:
+  name: "Negative times attribute"
+  expected_result: "error"
+  expected_error_message: "times attribute must be a positive integer, got '-5'"
+  description: "Negative times attribute should trigger error"
+-->
+<div>
+  <wr-for times="-5" variable="i">
+    <p>Content</p>
+  </wr-for>
+</div>

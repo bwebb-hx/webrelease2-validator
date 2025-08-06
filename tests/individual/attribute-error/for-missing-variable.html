@@ -1,0 +1,11 @@
+<!-- TEST_META:
+  name: "wr-for missing variable"
+  expected_result: "error"
+  expected_error_message: "Missing required attributes for 'wr-for': variable"
+  description: "wr-for without variable attribute should trigger error"
+-->
+<div>
+  <wr-for list="items">
+    <p>Content</p>
+  </wr-for>
+</div>
