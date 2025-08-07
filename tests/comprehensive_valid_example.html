@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Comprehensive WebRelease2 Example - All Elements</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Comprehensive WebRelease2 Template Example</h1>
+        <p>This template demonstrates correct usage of every WebRelease2 element.</p>
+
+        <!-- WebRelease2 Comments -->
+        <wr-->This is a WebRelease2 comment using wr-- syntax</wr-->
+        <wr-comment>This is a WebRelease2 comment using wr-comment syntax</wr-comment>
+
+        <!-- Basic Expressions -->
+        <section class="expressions">
+            <h2>Basic Expressions</h2>
+            <p>Page title: %pageTitle%</p>
+            <p>User name: %user.name%</p>
+            <p>First item: %items[0].title%</p>
+            <p>Dynamic index: %items[currentIndex]%</p>
+            <p>Current time: %currentTime()%</p>
+            <p>Formatted date: %formatDate(publishDate, "yyyy-MM-dd HH:mm")%</p>
+            <p>String length: %length(description)%</p>
+            <p>Null check: %isNull(optionalField)%</p>
+        </section>
+
+        <!-- Variable Operations -->
+        <section class="variables">
+            <h2>Variable Operations</h2>
+            <wr-variable name="counter" value="0"/>
+            <wr-variable name="results"/>
+            <wr-variable name="pageCount"/>
+            
+            <p>Initial counter value: %counter%</p>
+            <wr-append name="counter" value="5"/>
+            <p>Counter after append: %counter%</p>
+            
+            <wr-append name="results" value="item1"/>
+            <wr-append name="results" value="item2"/>
+            <p>Results: %results%</p>
+            
+            <wr-clear name="results"/>
+            <p>Results after clear: %results%</p>
+        </section>
+
+        <!-- Conditional Logic - wr-if -->
+        <section class="conditionals">
+            <h2>Conditional Logic</h2>
+            
+            <!-- Basic if-then-else -->
+            <wr-if condition="pageType == 'news'">
+                <wr-then>
+                    <div class="news-layout">
+                        <h3>News Article Layout</h3>
+                        <p>Article title: %title%</p>
+                        <p>Published: %formatDate(publishDate, "MMM dd, yyyy")%</p>
+                        <p>Author: %author.name%</p>
+                    </div>
+                </wr-then>
+                <wr-else>
+                    <div class="default-layout">
+                        <h3>Default Page Layout</h3>
+                        <p>Page content: %content%</p>
+                    </div>
+                </wr-else>
+            </wr-if>
+
+            <!-- If without else -->
+            <wr-if condition="showBanner == true">
+                <wr-then>
+                    <div class="banner">
+                        <p>Special promotion banner!</p>
+                    </div>
+                </wr-then>
+            </wr-if>
+
+            <!-- Nested conditionals -->
+            <wr-if condition="user.isLoggedIn == true">
+                <wr-then>
+                    <div class="user-content">
+                        <p>Welcome, %user.name%!</p>
+                        <wr-if condition="user.role == 'admin'">
+                            <wr-then>
+                                <p>Admin panel: <a href="/admin">Manage site</a></p>
+                            </wr-then>
+                            <wr-else>
+                                <p>Your dashboard: <a href="/dashboard">View profile</a></p>
+                            </wr-else>
+                        </wr-if>
+                    </div>
+                </wr-then>
+                <wr-else>
+                    <div class="guest-content">
+                        <p>Please <a href="/login">log in</a> to continue.</p>
+                    </div>
+                </wr-else>
+            </wr-if>
+        </section>
+
+        <!-- Switch Statements -->
+        <section class="switch-logic">
+            <h2>Switch Logic</h2>
+            
+            <wr-switch value="pageLayout">
+                <wr-case value="grid">
+                    <div class="grid-layout">
+                        <h3>Grid Layout</h3>
+                        <div class="grid">
+                            <wr-for list="items" variable="item" count="index">
+                                <div class="grid-item">
+                                    <h4>%item.title%</h4>
+                                    <p>%item.summary%</p>
+                                </div>
+                            </wr-for>
+                        </div>
+                    </div>
+                </wr-case>
+                <wr-case value="list">
+                    <div class="list-layout">
+                        <h3>List Layout</h3>
+                        <ul>
+                            <wr-for list="items" variable="item">
+                                <li>
+                                    <strong>%item.title%</strong> - %item.summary%
+                                </li>
+                            </wr-for>
+                        </ul>
+                    </div>
+                </wr-case>
+                <wr-case value="cards">
+                    <div class="card-layout">
+                        <h3>Card Layout</h3>
+                        <div class="cards">
+                            <wr-for list="items" variable="item">
+                                <div class="card">
+                                    <div class="card-header">%item.title%</div>
+                                    <div class="card-body">%item.content%</div>
+                                    <div class="card-footer">%formatDate(item.date, "MMM dd")%</div>
+                                </div>
+                            </wr-for>
+                        </div>
+                    </div>
+                </wr-case>
+                <wr-default>
+                    <div class="default-layout">
+                        <h3>Default Layout</h3>
+                        <p>Standard page layout for content display.</p>
+                        <div>%content%</div>
+                    </div>
+                </wr-default>
+            </wr-switch>
+        </section>
+
+        <!-- Conditional Groups -->
+        <section class="conditional-groups">
+            <h2>Conditional Groups</h2>
+            
+            <wr-conditional>
+                <wr-cond condition="isNotNull(startDate)">
+                    <p>Event starts: %formatDate(startDate, "yyyy/MM/dd HH:mm")%</p>
+                </wr-cond>
+                <wr-cond condition="isNotNull(endDate)">
+                    <p>Event ends: %formatDate(endDate, "yyyy/MM/dd HH:mm")%</p>
+                </wr-cond>
+                <wr-cond condition="isNotNull(location)">
+                    <p>Location: %location.name% - %location.address%</p>
+                </wr-cond>
+                <wr-cond condition="event.hasRegistration == true">
+                    <p><a href="%event.registrationUrl%">Register Now</a></p>
+                </wr-cond>
+            </wr-conditional>
+        </section>
+
+        <!-- Loops -->
+        <section class="loops">
+            <h2>Loop Examples</h2>
+            
+            <!-- List-based loop -->
+            <div class="list-loop">
+                <h3>Articles (List Loop)</h3>
+                <wr-for list="articles" variable="article" count="articleIndex">
+                    <article>
+                        <h4>%article.title%</h4>
+                        <p>%article.excerpt%</p>
+                        <small>Article #%articleIndex% | %formatDate(article.publishDate, "MMM dd, yyyy")%</small>
+                        
+                        <!-- Break after 10 articles -->
+                        <wr-break condition="articleIndex >= 10"/>
+                    </article>
+                </wr-for>
+            </div>
+
+            <!-- String-based loop -->
+            <div class="string-loop">
+                <h3>Categories (String Loop)</h3>
+                <wr-for string="categoryList" variable="category" index="catIndex">
+                    <span class="category-tag">
+                        %category%
+                        <wr-if condition="catIndex < length(categoryList) - 1">
+                            <wr-then>, </wr-then>
+                        </wr-if>
+                    </span>
+                </wr-for>
+            </div>
+
+            <!-- Times-based loop -->
+            <div class="times-loop">
+                <h3>Pagination (Times Loop)</h3>
+                <div class="pagination">
+                    <wr-for times="5" variable="pageNum">
+                        <a href="?page=%pageNum%" 
+                           class="%if(pageNum == currentPage, 'current', 'page-link')%">
+                            %pageNum%
+                        </a>
+                    </wr-for>
+                </div>
+            </div>
+
+            <!-- Nested loops -->
+            <div class="nested-loops">
+                <h3>Categories with Items (Nested Loops)</h3>
+                <wr-for list="categories" variable="category">
+                    <div class="category-section">
+                        <h4>%category.name%</h4>
+                        <wr-if condition="length(category.items) > 0">
+                            <wr-then>
+                                <ul>
+                                    <wr-for list="category.items" variable="item" count="itemIndex">
+                                        <li>
+                                            %item.name% - $%item.price%
+                                            <wr-break condition="itemIndex >= 5"/>
+                                        </li>
+                                    </wr-for>
+                                </ul>
+                            </wr-then>
+                            <wr-else>
+                                <p>No items in this category.</p>
+                            </wr-else>
+                        </wr-if>
+                    </div>
+                </wr-for>
+            </div>
+        </section>
+
+        <!-- Error Handling -->
+        <section class="error-handling">
+            <h2>Error Handling</h2>
+            
+            <!-- Conditional error -->
+            <wr-error condition="isNull(requiredField)">
+                <div class="error-message">
+                    <strong>Error:</strong> Required field is missing. Please provide a value.
+                </div>
+            </wr-error>
+            
+            <!-- Validation errors -->
+            <wr-error condition="length(email) == 0">
+                <p class="validation-error">Email address is required.</p>
+            </wr-error>
+            
+            <wr-error condition="isNull(user.permissions)">
+                <p class="access-error">Access denied. Insufficient permissions.</p>
+            </wr-error>
+
+            <!-- Unconditional error (maintenance mode) -->
+            <wr-error>
+                <div class="maintenance-notice">
+                    <h3>Maintenance Notice</h3>
+                    <p>This page is currently under maintenance. Please check back later.</p>
+                </div>
+            </wr-error>
+        </section>
+
+        <!-- Return Statements -->
+        <section class="returns">
+            <h2>Return Statements</h2>
+            
+            <!-- Early return based on condition -->
+            <wr-if condition="user.hasAccess == false">
+                <wr-then>
+                    <div class="access-denied">
+                        <h3>Access Denied</h3>
+                        <p>You do not have permission to view this content.</p>
+                    </div>
+                    <wr-return value="access_denied"/>
+                </wr-then>
+            </wr-if>
+
+            <!-- Return with success value -->
+            <wr-if condition="form.isValid == true">
+                <wr-then>
+                    <div class="success-message">
+                        <p>Form submitted successfully!</p>
+                    </div>
+                    <wr-return value="form_submitted"/>
+                </wr-then>
+            </wr-if>
+
+            <!-- Default return -->
+            <wr-return value="page_rendered"/>
+        </section>
+
+        <!-- Complex Example: User Dashboard -->
+        <section class="complex-example">
+            <h2>Complex Example: User Dashboard</h2>
+            
+            <wr-variable name="notificationCount" value="0"/>
+            
+            <div class="dashboard">
+                <header class="dashboard-header">
+                    <h3>Welcome, %user.profile.displayName%!</h3>
+                    <p>Last login: %formatDate(user.lastLogin, "MMM dd, yyyy 'at' HH:mm")%</p>
+                </header>
+
+                <!-- User role-based content -->
+                <wr-switch value="user.role">
+                    <wr-case value="admin">
+                        <div class="admin-panel">
+                            <h4>Admin Tools</h4>
+                            <ul>
+                                <li><a href="/admin/users">Manage Users</a></li>
+                                <li><a href="/admin/content">Manage Content</a></li>
+                                <li><a href="/admin/settings">System Settings</a></li>
+                            </ul>
+                        </div>
+                    </wr-case>
+                    <wr-case value="editor">
+                        <div class="editor-panel">
+                            <h4>Editor Tools</h4>
+                            <ul>
+                                <li><a href="/editor/posts">Manage Posts</a></li>
+                                <li><a href="/editor/media">Media Library</a></li>
+                            </ul>
+                        </div>
+                    </wr-case>
+                    <wr-default>
+                        <div class="user-panel">
+                            <h4>Your Account</h4>
+                            <ul>
+                                <li><a href="/profile">Edit Profile</a></li>
+                                <li><a href="/settings">Account Settings</a></li>
+                            </ul>
+                        </div>
+                    </wr-default>
+                </wr-switch>
+
+                <!-- Notifications -->
+                <div class="notifications">
+                    <h4>Recent Notifications</h4>
+                    <wr-if condition="length(user.notifications) > 0">
+                        <wr-then>
+                            <ul class="notification-list">
+                                <wr-for list="user.notifications" variable="notification" count="notifIndex">
+                                    <li class="notification %notification.type%">
+                                        <span class="message">%notification.message%</span>
+                                        <span class="time">%formatDate(notification.timestamp, "MMM dd, HH:mm")%</span>
+                                        <wr-append name="notificationCount" value="1"/>
+                                        <wr-break condition="notifIndex >= 10"/>
+                                    </li>
+                                </wr-for>
+                            </ul>
+                            <p>Total notifications: %notificationCount%</p>
+                        </wr-then>
+                        <wr-else>
+                            <p>No new notifications.</p>
+                        </wr-else>
+                    </wr-if>
+                </div>
+
+                <!-- Recent activity -->
+                <div class="recent-activity">
+                    <h4>Recent Activity</h4>
+                    <wr-conditional>
+                        <wr-cond condition="isNotNull(user.recentPosts)">
+                            <p>Recent posts: %length(user.recentPosts)%</p>
+                        </wr-cond>
+                        <wr-cond condition="isNotNull(user.recentComments)">
+                            <p>Recent comments: %length(user.recentComments)%</p>
+                        </wr-cond>
+                        <wr-cond condition="user.hasRecentActivity == false">
+                            <p>No recent activity to display.</p>
+                        </wr-cond>
+                    </wr-conditional>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>Generated on: %formatDate(currentTime(), "yyyy-MM-dd HH:mm:ss")%</p>
+            <wr-clear name="notificationCount"/>
+        </footer>
+    </div>
+</body>
+</html>
